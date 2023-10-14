@@ -1,6 +1,6 @@
 # DataCurrencies
 
-Bem-vindo ao projeto **DataCurrencies**, uma exploração profunda do mundo financeiro através dos dados. DataCurrencies é mais do que apenas um projeto de análise de dados; é uma jornada que transforma dados brutos em insights poderosos e práticos. Utilizando técnicas avançadas de ciência de dados, desvendamos os mistérios e dinâmicas complexas que permeiam o sistema bancário, revelando tendências, correlações e os impactos subtis que estes têm nas paisagens econômicas.
+Bem-vindo ao projeto **DataCurrencies**, uma exploração profunda do mundo financeiro através dos dados. 
 
 ## Sumário
 
