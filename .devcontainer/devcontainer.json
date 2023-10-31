@@ -1,0 +1,4 @@
+{
+    "postCreateCommand": "source .venv/bin/activate"
+  }
+  
