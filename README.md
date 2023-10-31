@@ -1,6 +1,6 @@
 # DataCurrencies
 
-Bem-vindo ao projeto **DataCurrencies**, uma exploração profunda do mundo financeiro através dos dados. 
+Bem-vindo ao projeto **DataCurrencies**.
 
 ## Sumário
 
