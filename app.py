@@ -52,7 +52,7 @@ def main():
         return
 
     with st.chat_message("assistant"):
-        st.write('Olá, seja bem vindo ao DataCurrencie Bank')
+        st.write('Olá, seja bem vindo ao sistema interno do DataCurrencie Bank')
 
     # Seção: Overview
     st.header('Data Overview')
@@ -148,21 +148,34 @@ def main():
     
     def plot_employment_duration_distribution(df):
         plt.figure(figsize=(8, 5))
-        sns.histplot(df['tempo_emprego'], bins=30, kde=True, color="#9c88ff")  # Usando roxo para o histograma
-        plt.title('')
-        plt.xlabel('Anos de Emprego')
-        plt.ylabel('Número de Clientes')
+        ax = sns.histplot(df['tempo_emprego'], bins=30, kde=True, color="#9c88ff")  # Usando roxo para o histograma
+        ax.set_title('')
+        ax.set_xlabel('Anos de Emprego')
+        ax.set_ylabel('Número de Clientes')
+        
+        # Remove the spines
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        # Show the plot in the Streamlit app
         st.pyplot(plt)
 
     def plot_income_distribution(df):
         # Aplicando a transformação logarítmica à renda
         df['renda_log'] = np.log(df['renda'] + 1)
         
+        # Set up the figure
         plt.figure(figsize=(8, 5))
-        sns.histplot(df['renda_log'], bins=30, kde=True, color="#9c88ff")  # Amarelo claro para o histograma
-        plt.title('')
-        plt.xlabel('Log da Renda')
-        plt.ylabel('Número de Clientes')
+        ax = sns.histplot(df['renda_log'], bins=30, kde=True, color="#9c88ff")
+        ax.set_title('')
+        ax.set_xlabel('Log da Renda')
+        ax.set_ylabel('Número de Clientes')
+        
+        # Remove the spines
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        # Show the plot in the Streamlit app
         st.pyplot(plt)
 
     # No corpo principal do Streamlit:
@@ -187,72 +200,67 @@ def main():
         st.pyplot(plt)
 
     # Secao: Outras Variaveis
-    st.subheader('Relações entre variáveis')
+    # Algumas estatísticas, Tem mais no .ipynb.
+    st.subheader('Análise Bivariada')
 
-    def plot_analises_comparativas(data):
+    # Initialize a Streamlit app and set up the tab
+    col1, col2 = st.columns(2)
 
-        # Verificar se todas as colunas necessárias estão presentes no DataFrame
-        colunas_necessarias = ['posse_de_veiculo', 'posse_de_imovel', 'idade', 'qtd_filhos', 'educacao', 'renda', 'tipo_renda', 'tempo_emprego']
-        for col in colunas_necessarias:
-            if col not in data.columns:
-                raise ValueError(f"Falta a coluna '{col}' no DataFrame fornecido.")
+    with col1:        
+        # Create a figure and a set of subplots
+        fig, axs = plt.subplots()
 
-        # Configurar subplots
-        fig, axs = plt.subplots(3, 2, figsize=(20, 18))
-        fig.tight_layout(pad=5.0)
+        # Create the crosstab and plot it
+        cross_tab = pd.crosstab(df['posse_de_veiculo'], df['posse_de_imovel'])
+        cross_tab.plot(kind='bar', stacked=True, color=["purple", "yellow"], ax=axs)
+        axs.set_title('')
+        axs.set_xlabel('Posse de Veículo')
+        axs.set_ylabel('Número de Clientes')
+        axs.legend(title='Posse de Imóvel', labels=['Sim', 'Não'])
 
-        # Gráfico 1: Relação entre Posse de Veículo e Posse de Imóvel
-        cross_tab = pd.crosstab(data['posse_de_veiculo'], data['posse_de_imovel'])
-        cross_tab.plot(kind='bar', stacked=True, ax=axs[0, 0])
-        axs[0, 0].set_title('Relação entre Posse de Veículo e Posse de Imóvel')
-        axs[0, 0].set_xlabel('Posse de Veículo')
-        axs[0, 0].set_ylabel('Contagem')
-        axs[0, 0].legend(title='Posse de Imóvel', labels=['Sim', 'Não'])
+        # Remove borders
+        axs.spines['top'].set_visible(False)
+        axs.spines['right'].set_visible(False)
+        axs.spines['bottom'].set_visible(False)
+        axs.spines['left'].set_visible(False)
 
-        # Gráfico 2: Média de Filhos por Faixa Etária
-        limites = [20, 30, 40, 50, 60, 70]
-        faixas_etarias = ["20-29", "30-39", "40-49", "50-59", "60+"]
-        data['faixa_etaria'] = pd.cut(data['idade'], bins=limites, labels=faixas_etarias, right=False)
-        media_filhos_por_faixa = data.groupby('faixa_etaria')['qtd_filhos'].mean()
-        media_filhos_por_faixa.plot(kind='bar', color='purple', alpha=0.7, ax=axs[0, 1])
-        axs[0, 1].set_title('Média de Filhos por Faixa Etária')
-        axs[0, 1].set_xlabel('Faixa Etária')
-        axs[0, 1].set_ylabel('Média de Filhos')
-
-        # Gráfico 3: Média da Renda Anual por Nível de Educação
-        media_renda_por_educacao = data.groupby('educacao')['renda'].mean().reset_index()
-        sns.barplot(x='renda', y='educacao', data=media_renda_por_educacao, palette='Set3', ax=axs[1, 0])
-        axs[1, 0].set_title('Média da Renda Anual por Nível de Educação')
-
-        # Gráfico 4: Relação entre Tipo de Renda e Tempo de Emprego
-        sns.boxplot(x='tipo_renda', y='tempo_emprego', data=data, palette='Set3', ax=axs[1, 1])
-        axs[1, 1].set_title('Relação entre Tipo de Renda e Tempo de Emprego')
-        axs[1, 1].set_xlabel('Tipo de Renda')
-        axs[1, 1].set_ylabel('Tempo de Emprego (Anos)')
-        axs[1, 1].tick_params(axis='x', rotation=45)
-
-        # Gráfico 5: Distribuição de Posse de Imóvel por Faixa de Renda Anual
-        faixas_renda = [0, 4000, 6000, 8000, float('inf')]
-        categorias_renda = ['0-4000', '4000-6000', '6000-8000', '8000+']
-        data['faixa_renda'] = pd.cut(data['renda'], bins=faixas_renda, labels=categorias_renda, right=False)
-        tabela_cruzada = pd.crosstab(data['faixa_renda'], data['posse_de_imovel'])
-        tabela_cruzada.plot(kind='bar', stacked=True, edgecolor='white', width=0.7, ax=axs[2, 0])
-        axs[2, 0].set_title('Distribuição de Posse de Imóvel por Faixa de Renda Anual')
-        axs[2, 0].set_xlabel('Faixa de Renda Anual')
-        axs[2, 0].set_ylabel('Contagem')
-
-        # Removendo o gráfico vazio
-        axs[2, 1].axis('off')
-
+        # Show the plot in the Streamlit app
         st.pyplot(fig)
 
-    plot_analises_comparativas(df)
+    with col2:    
+        # Define the age bins and labels
+        limites = [20, 30, 40, 50, 60, 70]
+        faixas_etarias = ["20-29", "30-39", "40-49", "50-59", "60+"]
+        
+        # Categorize the 'idade' into bins
+        df['faixa_etaria'] = pd.cut(df['idade'], bins=limites, labels=faixas_etarias, right=False)
+        
+        # Calculate the mean children per age group
+        media_filhos_por_faixa = df.groupby('faixa_etaria')['qtd_filhos'].mean()
+        
+        # Create a figure for the second plot
+        fig2, ax2 = plt.subplots()
+        
+        # Plot the average number of children by age group
+        media_filhos_por_faixa.plot(kind='bar', color='purple', alpha=0.7, ax=ax2)
+        ax2.set_title('')
+        ax2.set_xlabel('Faixa Etária')
+        ax2.set_ylabel('Média de Filhos')
+
+        # Remove borders
+        ax2.spines['top'].set_visible(False)
+        ax2.spines['right'].set_visible(False)
+        ax2.spines['bottom'].set_visible(False)
+        ax2.spines['left'].set_visible(False)
+
+        st.pyplot(fig2)
+
     # 2ª Seção: Upload e Análise da Base de Testes
-    st.header('2. Avaliação dos Dados')
+    st.header('2. Avaliação da Base de Clientes Recentes')
     
     # Carregando os modelos (substitua com o caminho correto para seus modelos)
-    logistic_model = load_model('caminho/para/seu/modelo_logistico.pkl')
-    lgbm_model = load_model('caminho/para/seu/modelo_lightgbm.pkl')
+    logistic_model = load_model('models/final_model.pkl')
+    lgbm_model = load_model('models/final_model_lightgbm.pkl')
 
     # Upload da base de dados de testes
     uploaded_file = st.file_uploader("Escolha um arquivo CSV", type=['csv'])
