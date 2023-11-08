@@ -58,9 +58,9 @@ Para iniciar o aplicativo, navegue até o diretório contendo app.py e execute o
    - São exibidos gráficos que mostram relações entre diferentes variáveis, como posse de veículo e posse de imóvel, bem como número médio de filhos por faixa etária.
 
 3. **Avaliação da Base de Clientes Recentes**
-   - É possível fazer upload de um arquivo CSV para a base de clientes recentes e selecionar um modelo de predição.
+   - É possível fazer upload de um arquivo .ftr para a base de clientes recentes e selecionar um modelo de predição.
    - O modelo escolhido (Regressão Logística ou LightGBM) é utilizado para fazer previsões na nova base de clientes.
-   - Os resultados da previsão podem ser baixados como um arquivo CSV.
+   - Os resultados da previsão podem ser baixados como um arquivo .ftr.
 
 
 ## Contribuição
